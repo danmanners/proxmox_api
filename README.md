@@ -1,87 +1,87 @@
 # proxmox_api
 
-Welcome to your new module. A short overview of the generated parts can be found in the PDK documentation at https://puppet.com/docs/pdk/latest/pdk_generating_modules.html .
-
-The README template below provides a starting point with details about what information to include in your README.
+This `proxmox_api` module allows you to simply and programatically control the [Proxmox Hypervisor](https://proxmox.com/en/).
 
 #### Table of Contents
 
 1. [Description](#description)
-2. [Setup - The basics of getting started with proxmox_api](#setup)
-    * [What proxmox_api affects](#what-proxmox_api-affects)
-    * [Setup requirements](#setup-requirements)
-    * [Beginning with proxmox_api](#beginning-with-proxmox_api)
+2. [Setup requirements](#setup-requirements)
 3. [Usage - Configuration options and additional functionality](#usage)
 4. [Limitations - OS compatibility, etc.](#limitations)
-5. [Development - Guide for contributing to the module](#development)
 
 ## Description
 
-Briefly tell users why they might want to use your module. Explain what your module does and what kind of problems users can solve with it.
+This `proxmox_api` module allows you to perform several functions. Currently, this includes:
 
-This should be a fairly short description helps the user decide if your module is what they want.
+1. Create a GenericCloud Cloud-Init enabled image by simply providing some values
+1. Clone an existing template VM.
 
-## Setup
+## Setup Requirements
 
-### What proxmox_api affects **OPTIONAL**
-
-If it's obvious what your module touches, you can skip this section. For example, folks can probably figure out that your mysql_instance module affects their MySQL instances.
-
-If there's more that they should know about, though, this is the place to mention:
-
-* Files, packages, services, or operations that the module will alter, impact, or execute.
-* Dependencies that your module automatically installs.
-* Warnings or other important notices.
-
-### Setup Requirements **OPTIONAL**
-
-If your module requires anything extra before setting up (pluginsync enabled, another module, etc.), mention it here.
-
-If your most recent release breaks compatibility or requires particular steps for upgrading, you might want to include an additional "Upgrading" section here.
-
-### Beginning with proxmox_api
-
-The very basic steps needed for a user to get the module up and running. This can include setup steps, if necessary, or it can be an example of the most basic use of the module.
+`proxmox_api` requires the [puppetlabs/stdlib v6.3.0](https://forge.puppet.com/puppetlabs/stdlib) library or later to your Puppetfile.
 
 ## Usage
 
-Include usage examples for common use cases in the **Usage** section. Show your users how to use your module to solve problems, and be sure to include code examples. Include three to five examples of the most important or common tasks a user can accomplish with your module. Show users how to accomplish more complex tasks that involve different types, classes, and functions working in tandem.
+Examples for each of the commands are below:
 
-## Reference
+### Create new GenericCloud VM Template
 
-This section is deprecated. Instead, add reference information to your code as Puppet Strings comments, and then use Strings to generate a REFERENCE.md in your module. For details on how to add code comments and generate documentation with Strings, see the Puppet Strings [documentation](https://puppet.com/docs/puppet/latest/puppet_strings.html) and [style guide](https://puppet.com/docs/puppet/latest/puppet_strings_style.html)
-
-If you aren't ready to use Strings yet, manually create a REFERENCE.md in the root of your module directory and list out each of your module's classes, defined types, facts, functions, Puppet tasks, task plans, and resource types and providers, along with the parameters for each.
-
-For each element (class, defined type, function, and so on), list:
-
-  * The data type, if applicable.
-  * A description of what the element does.
-  * Valid values, if the data type doesn't make it obvious.
-  * Default value, if any.
-
-For example:
-
+```ruby
+    proxmox_api::qemu::create_genericcloud {'Ubuntu2004-Template':
+      node              => 'pmx',
+          # Proxmox Node to create the VM on
+      vm_name           => 'Ubuntu2004-Template',
+          # New VM Template Name
+      ci_username       => 'ubuntu',
+          # Set the Cloud-Init Username
+      interface         => 'vmbr0',
+          # Set the Proxmox Network adapter to connect the template to
+      stor              => 'nvmestor',
+          # Set the storage volume for the VM Template
+      vmid              =>  9001,
+          # Set the ID for the new VM Template
+      image_type        => 'img',
+          # File type of the URL below
+      cloudimage_source => 'https://cloud-images.ubuntu.com/focal/current/focal-server-cloudimg-amd64.img',
+          # URL of the GenericCloud image
+    }
 ```
-### `pet::cat`
 
-#### Parameters
+### Cloning an existing VM Template
 
-##### `meow`
-
-Enables vocalization in your cat. Valid options: 'string'.
-
-Default: 'medium-loud'.
+```ruby
+    proxmox_api::qemu::clone {'test':
+      node             => 'pmx',
+          # Proxmox Node to create the VM on
+      vm_name          => 'TesterMcTesterson',
+          # New VM Name
+      clone_id         => 1001,
+          # The ID of the VM template
+      disk_size        => 20,
+          # Size of the new disk in GB
+      cpu_cores        => 2,
+          # Number of CPU cores
+      memory           => 4096,
+          # Amount of RAM in MB
+      ci_username      => 'root',
+          # Set the Cloud-Init Username
+      ci_password      => 'password',
+          # Set the Cloud-Init Password
+      protected        => true,
+          # Enable the 'Protected' flag
+      ipv4_static      => true,
+          # [OPTIONAL] Use Static IP
+      ipv4_static_cidr => '192.168.1.20/24',
+          # [OPTIONAL] Static IP and Subnet Mask
+      ipv4_static_gw   => '192.168.1.1',
+          # [OPTIONAL] Gateway Address
+    }
 ```
 
 ## Limitations
 
-In the Limitations section, list any incompatibilities, known issues, or other warnings.
+This is currently being developed and tested against a single [Proxmox 6.2-4](https://pve.proxmox.com/wiki/Roadmap#Proxmox_VE_6.2) node, and is not being actively tested against earlier versions. I cannot promise that things will work as expected if you are running earlier versions of Proxmox.
 
 ## Development
 
-In the Development section, tell other users the ground rules for contributing to your project and how they should submit their work.
-
-## Release Notes/Contributors/Etc. **Optional**
-
-If you aren't using changelog, put your release notes here (though you should consider using changelog). You can also add any additional sections you feel are necessary or important to include here. Please use the `## ` header.
+If there are features that this does not perform or if there are bugs you are encountering, [please feel free to open an issue](https://github.com/danmanners/proxmox_api/issues).
