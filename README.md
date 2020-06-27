@@ -2,7 +2,7 @@
 
 This `proxmox_api` module allows you to simply and programatically control the [Proxmox Hypervisor](https://proxmox.com/en/).
 
-#### Table of Contents
+## Table of Contents
 
 1. [Description](#description)
 2. [Setup requirements](#setup-requirements)
@@ -77,6 +77,20 @@ Examples for each of the commands are below:
           # [OPTIONAL] Gateway Address
     }
 ```
+
+## Recommendations
+
+I recommend using one of the following URLs for your Generic Cloud Images.
+
+- CentOS 8.2:
+  - [CentOS-8-GenericCloud-8.2.2004-20200611.2.x86_64.qcow2](https://cloud.centos.org/centos/8/x86_64/images/CentOS-8-GenericCloud-8.2.2004-20200611.2.x86_64.qcow2)
+- CentOS 7:
+  - [CentOS-7-x86_64-GenericCloud.qcow2](https://cloud.centos.org/centos/7/images/CentOS-7-x86_64-GenericCloud.qcow2)
+  - [CentOS-7-x86_64-GenericCloud.qcow2.xz](https://cloud.centos.org/centos/7/images/CentOS-7-x86_64-GenericCloud.qcow2.xz)
+- Ubuntu 20.04:
+  - [focal-server-cloudimg-amd64-disk-kvm.img](https://cloud-images.ubuntu.com/focal/current/focal-server-cloudimg-amd64-disk-kvm.img)
+- Ubuntu 18.04:
+  - [bionic-server-cloudimg-amd64.img](https://cloud-images.ubuntu.com/bionic/current/bionic-server-cloudimg-amd64.img)
 
 ## Limitations
 

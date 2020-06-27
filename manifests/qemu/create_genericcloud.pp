@@ -18,6 +18,9 @@ define proxmox_api::qemu::create_genericcloud (
   # Generate a list of VMIDS
   $vmids = $proxmox_qemu.map|$hash|{$hash['vmid']}
 
+  # Create Image Source Filename
+  $image_filename = regsubst($cloudimage_source, ".*\/(.*\b)(.${image_type})",'\\1')
+
   # Validate that the VMID doesn't already exist.
   if $vmid in $vmids {
     # Error out
@@ -40,17 +43,36 @@ define proxmox_api::qemu::create_genericcloud (
   }
 
   # Download the QEMU VM Template Image
-  file{"/mnt/${stor}/images/${vmid}/base-${vmid}-disk-0.${image_type}":
-    ensure => present,
-    source => $cloudimage_source,
-    mode   => '0644',
+  if $image_type in ['img','qemu2'] {
+    file{"/mnt/${stor}/images/${vmid}/base-${vmid}-disk-0.${image_type}":
+      ensure => present,
+      source => $cloudimage_source,
+      mode   => '0644',
+    }
+  } elsif $image_type == 'xz' {
+    file{"/mnt/${stor}/images//${vmid}/${image_filename}.${image_type}":
+      ensure => present,
+      source => $cloudimage_source,
+      mode   => '0644',
+    }
+  } else {
+    fail('Only [qemu,img,xz,tar.gz] filetypes are supported at this time.')
   }
 
-  # If necessary, convert the image format to qcow2.
-  if $image_type != '' {
-    exec{'convert_image_file':
-      command => "/usr/bin/qemu-img convert -f raw -O qcow2 \
+  # If necessary, convert the image format to qcow2 or decompress the file type to the right location.
+  if $image_type == 'img' {
+    exec{'convert_img_file':
+      command => "/usr/bin/qemu-img convert -O qcow2 \
         /mnt/${stor}/images/${vmid}/base-${vmid}-disk-0.${image_type} \
+        /mnt/${stor}/images/${vmid}/base-${vmid}-disk-0.qcow2 && \
+        /usr/bin/rm -f /mnt/${stor}/images/${vmid}/base-${vmid}-disk-0.${image_type}",
+    }
+  } elsif $image_type == 'xz' {
+    # Sets up file name
+    exec{'unpack_xz_file':
+      command => "/usr/bin/unxz \
+        /mnt/${stor}/images/${vmid}/${image_filename}.${image_type} && \
+        /usr/bin/mv /mnt/${stor}/images/${vmid}/${image_filename} \
         /mnt/${stor}/images/${vmid}/base-${vmid}-disk-0.qcow2",
     }
   }
@@ -60,18 +82,12 @@ define proxmox_api::qemu::create_genericcloud (
     command => "/usr/bin/pvesh create /nodes/${node}/qemu \
       --serial0=socket --vga=serial0 \
       --boot=c --agent=1 --bootdisk=scsi0 \
-      --ostype=l26 \
       --net0='model=e1000,bridge=${interface}' \
+      --ide2 nvmestor:cloudinit --sockets=1 --cores=1 \
+      --memory=2048 -scsihw='virtio-scsi-pci' --ostype=l26 \
       --numa 0 --template=1 --name='${vm_name}' --vmid=${vmid} \
-      --scsi0='${stor}:${vmid}/base-${vmid}-disk-0.qcow2,size=8G' \
-      --sockets=1 --cores=1 --memory=2048 -scsihw='virtio-scsi-pci'",
+      --scsi0='${stor}:${vmid}/base-${vmid}-disk-0.qcow2,size=8G'",
     onlyif  => "/usr/bin/test -f /mnt/${stor}/images/${vmid}/base-${vmid}-disk-0.qcow2"
-  }
-
-  # Create the Cloud-Init VM
-  exec{"create_cloudinit_${vmid}":
-    command => "/usr/sbin/qm set ${vmid} --ide2 local-lvm:cloudinit",
-    require => Exec["create_vm_${vmid}"]
   }
 
   # Set the configuration for the new QEMU Template VM
@@ -79,6 +95,6 @@ define proxmox_api::qemu::create_genericcloud (
     command => "/usr/bin/pvesh set /nodes/${node}/qemu/${vmid}/config \
       --ciuser='${ci_username}' -ipconfig0='ip=dhcp' ${sshkeys} \
       ${if_ci_password}",
-    require => Exec["create_cloudinit_${vmid}"]
+    require => Exec["create_vm_${vmid}"]
   }
 }
