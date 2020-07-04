@@ -28,7 +28,7 @@ Examples for each of the commands are below:
 
 ```ruby
     proxmox_api::qemu::create_genericcloud {'Ubuntu2004-Template':
-      node              => 'pmx',
+      pmx_node          => 'pmx',
           # Proxmox Node to create the VM on
       vm_name           => 'Ubuntu2004-Template',
           # New VM Template Name
@@ -36,14 +36,16 @@ Examples for each of the commands are below:
           # Set the Cloud-Init Username
       interface         => 'vmbr0',
           # Set the Proxmox Network adapter to connect the template to
-      stor              => 'nvmestor',
+      storage_id        => 'local',
           # Set the storage volume for the VM Template
-      vmid              =>  9001,
+      default_disk_size => '20G',
+          # Defaults to an 8G size if left undefined, but can be set.
+      vmid              =>  20001,
           # Set the ID for the new VM Template
-      image_type        => 'img',
-          # File type of the URL below
       cloudimage_source => 'https://cloud-images.ubuntu.com/focal/current/focal-server-cloudimg-amd64.img',
           # URL of the GenericCloud image
+      image_type        => 'img',
+          # File type of the URL below
     }
 ```
 
@@ -85,8 +87,7 @@ I recommend using one of the following URLs for your Generic Cloud Images.
 - CentOS 8.2:
   - [CentOS-8-GenericCloud-8.2.2004-20200611.2.x86_64.qcow2](https://cloud.centos.org/centos/8/x86_64/images/CentOS-8-GenericCloud-8.2.2004-20200611.2.x86_64.qcow2)
 - CentOS 7:
-  - [CentOS-7-x86_64-GenericCloud.qcow2](https://cloud.centos.org/centos/7/images/CentOS-7-x86_64-GenericCloud.qcow2)
-  - [CentOS-7-x86_64-GenericCloud.qcow2.xz](https://cloud.centos.org/centos/7/images/CentOS-7-x86_64-GenericCloud.qcow2.xz)
+  - [CentOS-7-x86_64-GenericCloud](https://cloud.centos.org/centos/7/images/CentOS-7-x86_64-GenericCloud-2003.qcow2.xz)
 - Ubuntu 20.04:
   - [focal-server-cloudimg-amd64-disk-kvm.img](https://cloud-images.ubuntu.com/focal/current/focal-server-cloudimg-amd64-disk-kvm.img)
 - Ubuntu 18.04:
