@@ -1,5 +1,12 @@
 # Changelog
 
+## Release 0.1.3
+
+**Features**
+
+- Improving code quality.
+- Further ensuring that error handling is best approached.
+
 ## Release 0.1.2
 
 **Features**
