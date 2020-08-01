@@ -2,25 +2,25 @@
 # Sets all of the relevant settings through several commands.
 define proxmox_api::qemu::clone (
   # Clone Settings
-  String[1]   $node,
-  Integer     $clone_id,
-  String      $vm_name,
-  Integer     $newid            = Integer($facts['proxmox_cluster_nextid']),
-  String      $description      = '',
-  Boolean     $clone_type       = true,
-  String      $disk_target      = '',
+  String[1]         $node,
+  Integer[1]        $clone_id,
+  String[1]         $vm_name,
+  Integer           $newid            = Integer($facts['proxmox_cluster_nextid']),
+  Boolean           $clone_type       = true,
+  Optional[String]  $description      = Undef,
+  Optional[String]  $disk_target      = Undef,
   # VM Settings
-  Integer     $disk_size        = 8, # Make sure you only use whole numbers larger than 8; this is multiplied by 1024.
-  Integer     $cpu_sockets      = 1,
-  Integer     $cpu_cores        = 1,
-  Integer     $memory           = 2048,
-  Boolean     $protected        = false,
+  Integer     $disk_size              = 8, # Make sure you only use whole numbers larger than 8; this is multiplied by 1024.
+  Integer     $cpu_sockets            = 1,
+  Integer     $cpu_cores              = 1,
+  Integer     $memory                 = 2048,
+  Boolean     $protected              = false,
   # Cloud-Init Values
-  Boolean     $ipv4_static      = false,
-  String      $ipv4_static_cidr = '', # Needs to be in the format '192.168.1.20/24'
-  String      $ipv4_static_gw   = '', # Needs to be in the format '192.168.1.1'
-  String      $ci_username      = '',
-  String      $ci_password      = '',
+  Optional[Boolean] $ipv4_static      = false,
+  Optional[String]  $ipv4_static_cidr = Undef, # Needs to be in the format '192.168.1.20/24'
+  Optional[String]  $ipv4_static_gw   = Undef, # Needs to be in the format '192.168.1.1'
+  Optional[String]  $ci_username      = Undef,
+  Optional[String]  $ci_password      = Undef,
   # String      $ci_sshkey        = '', # Commented out; difficulties below.
 ) {
 
