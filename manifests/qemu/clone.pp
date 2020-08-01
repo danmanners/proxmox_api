@@ -26,23 +26,24 @@ define proxmox_api::qemu::clone (
   String[1]         $pmx_node,
   Integer[1]        $clone_id,
   String[1]         $vm_name,
-  String            $disk_size,
-  Optional[String]  $disk_target  = undef,
-  Optional[String]  $description  = undef,
-  Integer           $newid         = Integer($facts['proxmox_cluster_nextid']),
+  Optional[String]  $disk_size        = undef,
+  Optional[Integer] $newid            = Integer($facts['proxmox_cluster_nextid']),
   # VM Settings
-  Integer           $cpu_sockets  = 1,
-  Integer           $cpu_cores    = 1,
-  Integer           $memory       = 2048,
-  Boolean           $protected    = false,
-  Boolean           $clone_type    = true,
+  Optional[Integer] $cpu_sockets      = 1,
+  Optional[Integer] $cpu_cores        = 1,
+  Optional[Integer] $memory           = 2048,
+  Optional[Boolean] $protected        = false,
+  Optional[Boolean] $clone_type       = true,
+  # Target Volume and Description
+  Optional[String]  $disk_target      = undef,
+  Optional[String]  $description      = undef,
   # Network & Cloud-Init Settings
-  Optional[Boolean] $ipv4_static  = false,
+  Optional[Boolean] $ipv4_static      = false,
   Optional[String]  $ipv4_static_cidr = undef, # Needs to be in the format '192.168.1.20/24'
-  Optional[String]  $ipv4_static_gw = undef, # Needs to be in the format '192.168.1.1'
-  Optional[String]  $ci_username,
-  Optional[String]  $ci_password,
-  # String      $ci_sshkey        = '', # Commented out; difficulties below.
+  Optional[String]  $ipv4_static_gw   = undef, # Needs to be in the format '192.168.1.1'
+  Optional[String]  $ci_username      = undef,
+  Optional[String]  $ci_password      = undef,
+  # Optional[String]  $ci_sshkey        = '', # Commented out; difficulties below.
 ) {
 
   # Get and parse the facts for VMs, Storage, and Nodes.
@@ -83,8 +84,10 @@ define proxmox_api::qemu::clone (
   # If the New ID is in the list, simply don't attempt to create/overwrite it.
   if ! ($newid in $vmids) {
     # Evaluate if there's a Description string.
-    if $description {
+    if ($description != undef) {
       $if_description = "--description='${description}'"
+    } else {
+      $if_description = ''
     }
 
     # Evaluate if there's a Disk Target String.
@@ -108,16 +111,22 @@ define proxmox_api::qemu::clone (
     # Evaluate if there's a Clone Type Boolean
     if ($clone_type == true) {
       $if_clone_type = '--full 1'
+    } elsif ($clone_type == false) {
+      $if_clone_type = ''
     }
 
     # Check if there's a custom Cloud-Init User
-    if ($ci_username != '') {
+    if $ci_username {
       $if_ciuser = "--ciuser=${ci_username}"
+    } else {
+      $if_ciuser = ''
     }
 
     # Check if there's a custom Cloud-Init Password
-    if ($ci_password != '') {
+    if $ci_password {
       $if_cipassword = "--cipassword='${ci_username}'"
+    } else {
+      $if_cipassword = ''
     }
 
     # Check if there's a custom Cloud-Init SSH Key, and URI encodes it
@@ -161,7 +170,7 @@ define proxmox_api::qemu::clone (
       command => "/usr/bin/pvesh set /nodes/${pmx_node}/qemu/${newid}/config \
       --sockets=${cpu_sockets} --cores=${cpu_cores} --memory=${memory} \
       ${if_protection} ${if_ciuser} ${if_cipassword} ${if_nondhcp}",
-      require => Exec["set_disk_size_${newid}"],
+      require => Exec["clone_${clone_id}_to_${newid}"],
     }
   }
 }
