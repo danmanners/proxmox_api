@@ -1,32 +1,35 @@
 {
   "name": "danmanners-proxmox_api",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "author": "Dan Manners",
   "summary": "Allows simple and programatic control over the Proxmox Hypervisor.",
   "license": "Apache-2.0",
   "source": "https://github.com/danmanners/proxmox_api",
   "issues_url": "https://github.com/danmanners/proxmox_api/issues",
   "dependencies": [
-
+    {
+      "name": "puppetlabs/stdlib",
+      "version_requirement": ">= 5.0.0 < 7.0.0"
+    }
   ],
   "operatingsystem_support": [
     {
       "operatingsystem": "Debian",
       "operatingsystemrelease": [
-        "9"
+        "10"
       ]
     },
     {
-      "operatingsystem": "Ubuntu",
+      "operatingsystem": "Proxmox-VE",
       "operatingsystemrelease": [
-        "18.04"
+        ">6.2.0"
       ]
     }
   ],
   "requirements": [
     {
-      "name": "puppet",
-      "version_requirement": ">= 4.10.0 < 7.0.0"
+      "name": "puppetlabs/stdlib",
+      "version_requirement": ">= 5.0.0 < 7.0.0"
     }
   ],
   "pdk-version": "1.18.0",
