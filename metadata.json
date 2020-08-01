@@ -1,6 +1,6 @@
 {
   "name": "danmanners-proxmox_api",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "author": "Dan Manners",
   "summary": "Allows simple and programatic control over the Proxmox Hypervisor.",
   "license": "Apache-2.0",

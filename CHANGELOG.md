@@ -1,6 +1,22 @@
 # Changelog
 
-All notable changes to this project will be documented in this file.
+## Release 0.1.2
+
+**Features**
+
+- Ensured that both `proxmox_api::qemu::create_genericcloud` and `proxmox_api::qemu::clone` are idempotent.
+  - If you now re-run either of them with new VMID values targeting ID's that already exist, they will simply not attempt to overwrite what's already there. This allows the same code to be re-run.
+
+**Bugfixes**
+
+- Fixed and reworked the Clone functionality.
+
+## Release 0.1.1
+
+**Update**
+
+- Added the changelog properly
+- Updated the `metadata.json` file to add requirements.
 
 ## Release 0.1.0 - Initial Commit
 
@@ -13,6 +29,3 @@ All notable changes to this project will be documented in this file.
 
 - n/a
 
-**Known Issues**
-
-- Currently, adding SSH keys doesn't work and should be done manually. Looks to be an issue with how Ruby processes urlencoded strings, but otherwise TBD.

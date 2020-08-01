@@ -13,12 +13,8 @@ This `proxmox_api` module allows you to simply and programatically control the [
 
 This `proxmox_api` module allows you to perform several functions. Currently, this includes:
 
-1. Create a GenericCloud Cloud-Init enabled image by simply providing some values
+1. Create GenericCloud Cloud-Init enabled image by simply providing some values.
 1. Clone an existing template VM.
-
-## Setup Requirements
-
-`proxmox_api` requires the [puppetlabs/stdlib v6.3.0](https://forge.puppet.com/puppetlabs/stdlib) library or later to your Puppetfile.
 
 ## Usage
 
@@ -82,7 +78,7 @@ Examples for each of the commands are below:
 
 ## Recommendations
 
-I recommend using one of the following URLs for your Generic Cloud Images.
+I'd like to suggest using one of the following URLs for your Generic Cloud Images.
 
 - CentOS 8.2:
   - [CentOS-8-GenericCloud-8.2.2004-20200611.2.x86_64.qcow2](https://cloud.centos.org/centos/8/x86_64/images/CentOS-8-GenericCloud-8.2.2004-20200611.2.x86_64.qcow2)
@@ -95,8 +91,13 @@ I recommend using one of the following URLs for your Generic Cloud Images.
 
 ## Limitations
 
-This is currently being developed and tested against a single [Proxmox 6.2-4](https://pve.proxmox.com/wiki/Roadmap#Proxmox_VE_6.2) node, and is not being actively tested against earlier versions. I cannot promise that things will work as expected if you are running earlier versions of Proxmox.
+- This is currently being developed and tested against a single [Proxmox 6.2-4](https://pve.proxmox.com/wiki/Roadmap#Proxmox_VE_6.2) node, and is not being actively tested against earlier versions. I cannot promise that things will work as expected if you are running earlier versions of Proxmox.
+- This will not (but absolutely could) non-template virtual machines. Reason being is that if you're cloning non-template VM's you're probably approaching your infrastructure wrong.
 
 ## Development
 
 If there are features that this does not perform or if there are bugs you are encountering, [please feel free to open an issue](https://github.com/danmanners/proxmox_api/issues).
+
+# Known Issues
+
+- Currently, adding SSH keys doesn't work and should be done manually. Looks to be an issue with how Ruby processes urlencoded strings, but otherwise TBD.
